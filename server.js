@@ -1,14 +1,18 @@
-// server.js (at root level)
+// server.js (root level)
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
+import passport from 'passport'; // ✅ ADD
 
 import config from './src/config/env.config.js';
 import connectDB from './src/config/db.js';
 import authRoutes from './src/routes/auth.routes.js';
 import errorHandler from './src/middleware/errorHandler.js';
+
+// ✅ LOAD PASSPORT CONFIG
+import './src/config/passport.js';
 
 const app = express();
 
@@ -22,6 +26,9 @@ app.use(cors({
   origin: config.server.frontendUrl,
   credentials: true
 }));
+
+// ✅ INITIALIZE PASSPORT
+app.use(passport.initialize());
 
 const limiter = rateLimit({
   windowMs: config.security.rateLimitWindow,
