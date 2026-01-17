@@ -8,8 +8,11 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-     callbackURL: process.env.GOOGLE_CALLBACK_URL,
-},
+    // ✅ FIX: callback URL MUST be absolute and NEVER undefined
+      callbackURL:
+        process.env.GOOGLE_CALLBACK_URL ||
+        "https://plm-backend-jcby.onrender.com/api/auth/google/callback",
+    },
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails?.[0]?.value;
