@@ -26,7 +26,8 @@ app.use(helmet());
 // ================= ✅ FIXED CORS CONFIG =================
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://plm-frontend-prod.vercel.app"
+  "https://plm-frontend-prod.vercel.app",
+  "https://plm-frontend-prod-kzjfv2nux-allinonetech.vercel.app"
 ];
 
 app.use(
