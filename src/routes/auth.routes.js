@@ -32,9 +32,13 @@ router.get(
   }),
   (req, res) => {
     const token = req.user.accessToken;
-    res.redirect(
-      `http://localhost:5173/oauth-success?token=${token}`
-    );
+
+    // ✅ FIX: use frontend URL from env (fallback added)
+    const frontendURL =
+      process.env.FRONTEND_URL ||
+      "https://plm-frontend-prod-cqxect6wb-allinonetech.vercel.app";
+
+    res.redirect(`${frontendURL}/oauth-success?token=${token}`);
   }
 );
 
