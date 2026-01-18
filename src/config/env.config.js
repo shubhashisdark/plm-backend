@@ -35,6 +35,12 @@ const config = {
       authKey: process.env.MSG91_AUTH_KEY,
       templateId: process.env.MSG91_TEMPLATE_ID
     },
+    // ✅ email configuration
+  email: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    fromName: process.env.EMAIL_FROM_NAME || 'PropertyList'
+  },
     twilio: {
       accountSid: process.env.TWILIO_ACCOUNT_SID,
       authToken: process.env.TWILIO_AUTH_TOKEN,
