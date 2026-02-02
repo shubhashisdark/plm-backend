@@ -8,17 +8,25 @@ import { OAuth2Client } from 'google-auth-library';
 
 /* ================= SEND OTP ================= */
 export const sendOTPHandler = catchAsync(async (req, res, next) => {
+  console.log('📨 [sendOTPHandler] Request received');
+  console.log('📨 [sendOTPHandler] Body:', req.body);
+  
   const { phone, type = 'signin' } = req.body;
+  console.log('📨 [sendOTPHandler] Phone:', phone, 'Type:', type);
 
   if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+    console.error('❌ [sendOTPHandler] Phone validation failed:', phone);
     return next(new AppError('Invalid phone number', 400));
   }
 
   if (type === 'signin') {
+    console.log('📨 [sendOTPHandler] Checking if user exists for signin...');
     const user = await User.findActiveUser({ phone });
     if (!user) {
+      console.error('❌ [sendOTPHandler] User not found for phone:', phone);
       return next(new AppError('User not found. Please sign up first.', 404));
     }
+    console.log('✅ [sendOTPHandler] User found:', user._id);
   }
 
   await OTP.cleanupOldOTPs(phone);
@@ -29,12 +37,18 @@ export const sendOTPHandler = catchAsync(async (req, res, next) => {
   });
 
   if (recentOTPs >= 3) {
+    console.error('❌ [sendOTPHandler] Too many OTP requests for phone:', phone);
     return next(new AppError('Too many OTP requests. Please try after 15 minutes.', 429));
   }
 
   const otpCode = generateOTP();
+  console.log('📨 [sendOTPHandler] Generated OTP:', otpCode);
+  
   await OTP.create({ phone, otp: otpCode, type });
+  console.log('📨 [sendOTPHandler] OTP saved to database');
+  
   await sendOTP(phone, otpCode);
+  console.log('📨 [sendOTPHandler] sendOTP function completed');
 
   res.status(200).json({
     success: true,

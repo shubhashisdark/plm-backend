@@ -10,9 +10,30 @@ export const generateOTP = () => {
 
 // Send OTP via SMS
 export const sendOTP = async (phone, otp) => {
-  try {
-    const provider = config.sms.provider;
+  console.log('🔔 [sendOTP] Function called with phone:', phone, 'otp:', otp);
+  
+  const provider = config.sms.provider;
+  const env = config.server.env;
+  
+  console.log('🔔 [sendOTP] Environment:', env, 'Provider:', provider);
+  
+  // Always log OTP in development mode (regardless of provider)
+  if (env !== 'production') {
+    console.log(`
+╔════════════════════════════════════╗
+║         OTP GENERATED              ║
+╠════════════════════════════════════╣
+║  Phone: ${phone.padEnd(24)} ║
+║  OTP:   ${otp.padEnd(24)} ║
+║  Valid: ${config.otp.expiryMinutes} minutes${' '.repeat(16)} ║
+╚════════════════════════════════════╝
+    `);
+    // In development, just return without sending SMS
+    return true;
+  }
 
+  // Production: Actually send SMS
+  try {
     // MSG91 (Recommended for India)
     if (provider === 'msg91') {
       await axios.get('https://api.msg91.com/api/v5/otp', {
@@ -42,19 +63,6 @@ export const sendOTP = async (phone, otp) => {
       });
       
       console.log(`📱 OTP sent via Twilio to ${phone}`);
-    }
-    
-    // Development mode - log to console
-    else {
-      console.log(`
-╔════════════════════════════════════╗
-║         OTP GENERATED              ║
-╠════════════════════════════════════╣
-║  Phone: ${phone.padEnd(24)} ║
-║  OTP:   ${otp.padEnd(24)} ║
-║  Valid: ${config.otp.expiryMinutes} minutes${' '.repeat(16)} ║
-╚════════════════════════════════════╝
-      `);
     }
 
     return true;
